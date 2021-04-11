@@ -33,3 +33,19 @@ class AngleTests(unittest.TestCase):
                          Angle.convert_dd_to_dms(45.9589599661111000, AT_LATITUDE, dms_format=AF_DMSH_SPACE_SEP, prec=2))
         self.assertEqual('45-57-32.3S',
                          Angle.convert_dd_to_dms(-45.9589599661111000, AT_LATITUDE, dms_format=AF_DMSH_HYPHEN_SEP, prec=1))
+
+    def test_normalize_angle(self):
+        self.assertEqual('32 44 56.77N', Angle.normalize_angle(' 32 44 56.77N'))
+        self.assertEqual('32 44 56.77N', Angle.normalize_angle('32 44 56.77N       '))
+        self.assertEqual('32 44 56.77N', Angle.normalize_angle('32 44 56,77N'))
+        self.assertEqual('32 44 56.77N', Angle.normalize_angle('32 44 56.77n'))
+        self.assertEqual('32 44 56.77N', Angle.normalize_angle('32   44     56.77n'))
+        self.assertEqual('32 - 44 - 56.77N', Angle.normalize_angle('32   - 44   -  56.77n'))
+
+    def test_dmsh_parts_to_dd(self):
+        self.assertEqual(None, Angle.dmsh_parts_to_dd((100, 61, 59, 'W')))
+        self.assertEqual(None, Angle.dmsh_parts_to_dd((100, 0, 60, 'E')))
+        self.assertEqual(None, Angle.dmsh_parts_to_dd((100, -1, 0, 'S')))
+        self.assertEqual(None, Angle.dmsh_parts_to_dd((100, 5, 10, 'A')))
+        self.assertEqual(100.59555555555555, Angle.dmsh_parts_to_dd((100, 35, 44, 'N')))
+        self.assertEqual(-100.59555555555555, Angle.dmsh_parts_to_dd((100, 35, 44, 'W')))

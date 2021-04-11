@@ -1,4 +1,5 @@
 import math
+import re
 
 # Angle types
 AT_LONGITUDE = 'AT_LONGITUDE '
@@ -95,3 +96,27 @@ class Angle:
 
         dms_format_pattern = ANGLE_FORMAT_PATTERNS[ang_type][dms_format]
         return dms_format_pattern.format(d=d, m=m, s=s, sec_length=sec_length, sec_prec=prec, hem=hem)
+
+    @staticmethod
+    def normalize_angle(ang_src):
+        """ Normalize angle, e. g. replace ',' with '.', ensure cardinal directions (N, S etc.) are capital etc.
+        :param ang_src: str, angle source value
+        """
+        norm_ang = ang_src.strip().upper().replace(',', '.')
+        norm_ang = re.sub(r'\s+', ' ', norm_ang)
+        return norm_ang
+
+    @staticmethod
+    def dmsh_parts_to_dd(dmsh_parts):
+        """ Convert coordinates parts into degrees minutes format.
+        Note: If angle is within range, example longitude <-180, 180> will be check in separated method.
+        :param dmsh_parts: tuple of degrees (int), minutes (int), seconds (float) and hemisphere character (str)
+        :return: dd: float
+        """
+        d, m, s, h = dmsh_parts
+        if (0 <= m < 60) and (0 <= s < 60):
+            dd = d + m / 60 + s / 3600
+            if h in ['W', 'S']:
+                return -dd
+            elif h in ['N', 'E']:
+                return dd
