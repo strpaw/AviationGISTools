@@ -14,6 +14,8 @@ class Distance:
         separator, example: 109,25 109.25.
     src_uom : str
         Keeps source unit of measure of distance, e.g. UOM_M, UOM_KM.
+    dist_label: str
+        Keeps customized label for distance that will be used in err_msg, e. g. Circle radius,
     err_msg: str
         Keeps error message why distance is not valid, for example is unit of measure is not valid.
     is_valid: bool
@@ -24,9 +26,10 @@ class Distance:
         Keeps source distance as float in source unit of measure, only if src_dist is valid.
     """
 
-    def __init__(self, src_dist, src_uom=UOM_M):
+    def __init__(self, src_dist, src_uom=UOM_M, dist_label='Distance'):
         self.src_dist = src_dist
         self.src_uom = src_uom
+        self.dist_label = dist_label
         self.err_msg = ''
         self.is_valid = None
         self.num_dist = None
@@ -59,15 +62,25 @@ class Distance:
 
     def check_distance(self):
         """ Check if distance is valid: check i both source UOM and source (initial) distance are valid. """
+        err_required = '{label} is required.'
+        err_uom = '{label} UOM error.'
+        err_value = '{label} value error.'
+        self.is_valid = True
+
+        if self.src_dist == "":
+            self.err_msg += err_required.format(label=self.dist_label)
+            self.is_valid = False
+
         is_valid_uom = self.check_distance_uom()
         if not is_valid_uom:
-            self.err_msg += 'Distance UOM error.'
+            self.err_msg += err_uom.format(label=self.dist_label)
+            self.is_valid = False
 
-        is_valid_distance_value = self.check_distance_value()
-        if not is_valid_distance_value:
-            self.err_msg += 'Distance value error.'
-
-        self.is_valid = bool(is_valid_uom and is_valid_distance_value)
+        if self.src_dist:
+            is_valid_distance_value = self.check_distance_value()
+            if not is_valid_distance_value:
+                self.err_msg += err_value.format(label=self.dist_label)
+                self.is_valid = False
 
     def convert_distance_to_meters(self):
         """ Convert source distance value from source UOM to meters. """

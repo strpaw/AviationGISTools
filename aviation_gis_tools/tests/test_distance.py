@@ -45,14 +45,30 @@ class DistanceTests(unittest.TestCase):
 
     def test_error_message_value_error(self):
         d = Distance('', UOM_M)
-        self.assertEqual('Distance value error.', d.err_msg)
+        self.assertEqual('Distance is required.', d.err_msg)
 
         d = Distance('10,6,6', UOM_SM)
         self.assertEqual('Distance value error.', d.err_msg)
 
     def test_error_message_value_and_uom_error(self):
         d = Distance('', '../test')
-        self.assertEqual('Distance UOM error.Distance value error.', d.err_msg)
+        self.assertEqual('Distance is required.Distance UOM error.', d.err_msg)
+
+    def test_custom_distance_label_err_msg(self):
+        d = Distance(1, '', 'Circle radius')
+        self.assertEqual('Circle radius UOM error.', d.err_msg)
+
+        d = Distance(100.66, '', 'Circle sector radius')
+        self.assertEqual('Circle sector radius UOM error.', d.err_msg)
+
+        d = Distance('', UOM_M, 'Inner radius')
+        self.assertEqual('Inner radius is required.', d.err_msg)
+
+        d = Distance('10,6,6', UOM_SM, 'Outer radius')
+        self.assertEqual('Outer radius value error.', d.err_msg)
+
+        d = Distance('', '../test', 'Circle radius')
+        self.assertEqual('Circle radius is required.Circle radius UOM error.', d.err_msg)
 
     def test_convert_dist_to_m(self):
         d = Distance(135.75)
