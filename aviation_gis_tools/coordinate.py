@@ -12,7 +12,15 @@ COORDINATE_COMPACTED = {
                                          (?P<deg>180|1[0-7]\d|0\d{2})  # Degrees
                                          (?P<min>[0-5]\d)  # Minutes
                                          (?P<sec>[0-5]\d\.\d+$|[0-5]\d$)  # Seconds             
-                                      ''', re.VERBOSE)
+                                      ''', re.VERBOSE),
+        'DMH_COMPACTED': re.compile(r'''(?P<deg>^180|^1[0-7]\d|^0\d{2})  # Degrees
+                                        (?P<min>[0-5]\d\.\d+|[0-5]\d)  # Minutes
+                                        (?P<hem>[EW]$)  # Hemisphere
+                                    ''', re.VERBOSE),
+        'HDM_COMPACTED': re.compile(r'''(?P<hem>^[EW])  # Hemisphere
+                                        (?P<deg>180|1[0-7]\d|0\d{2})  # Degrees
+                                        (?P<min>[0-5]\d\.\d+$|[0-5]\d$)  # Minutes
+                                    ''', re.VERBOSE)
     },
     AT_LATITUDE: {
         'DMSH_COMPACTED': re.compile(r'''(?P<deg>^90|^[0-8]\d)  # Degrees
@@ -24,7 +32,15 @@ COORDINATE_COMPACTED = {
                                          (?P<deg>90|[0-8]\d)  # Degrees
                                          (?P<min>[0-5]\d)  # Minutes
                                          (?P<sec>[0-5]\d\.\d+$|[0-5]\d$)  # Seconds
-                                     ''', re.VERBOSE)
+                                     ''', re.VERBOSE),
+        'DMH_COMPACTED': re.compile(r'''(?P<deg>^90|^[0-8]\d)  # Degrees
+                                        (?P<min>[0-5]\d\.\d+|[0-5]\d)  # Minutes
+                                        (?P<hem>[NS]$)  # Hemisphere
+                                    ''', re.VERBOSE),
+        'HDM_COMPACTED': re.compile(r'''(?P<hem>^[NS])  # Hemisphere
+                                         (?P<deg>90|[0-8]\d)  # Degrees
+                                         (?P<min>[0-5]\d\.\d+$|[0-5]\d$)  # Seconds
+                                    ''', re.VERBOSE)
     }
 }
 
@@ -60,16 +76,25 @@ class Coordinate(Angle):
         :return: float: angle in decimal degrees format, if conversion failed (not supported format,
                  error in angle example minutes >= 60, incorrect type - returns None)
         """
-        for pattern in COORDINATE_COMPACTED[ang_type].values():
+        dd = None
+        for coord_type, pattern in COORDINATE_COMPACTED[ang_type].items():
             if pattern.match(ang):
-                dmsh_parts = pattern.search(ang)
-                d = int(dmsh_parts.group('deg'))
-                m = int(dmsh_parts.group('min'))
-                s = float(dmsh_parts.group('sec'))
-                h = dmsh_parts.group('hem')
-                dd = Coordinate.dmsh_parts_to_dd((d, m, s, h))
-                if Coordinate.is_coordinate_within_range(dd, ang_type):
-                    return dd
+                if coord_type in ['DMSH_COMPACTED', 'HDMS_COMPACTED']:
+                    dmsh_parts = pattern.search(ang)
+                    d = int(dmsh_parts.group('deg'))
+                    m = int(dmsh_parts.group('min'))
+                    s = float(dmsh_parts.group('sec'))
+                    h = dmsh_parts.group('hem')
+                    dd = Coordinate.dmsh_parts_to_dd((d, m, s, h))
+                elif coord_type in ['DMH_COMPACTED', 'HDM_COMPACTED']:
+                    dmh_parts = pattern.search(ang)
+                    d = int(dmh_parts.group('deg'))
+                    m = float(dmh_parts.group('min'))
+                    h = dmh_parts.group('hem')
+                    dd = Coordinate.dmh_parts_to_dd((d, m, h))
+        if dd:
+            if Coordinate.is_coordinate_within_range(dd, ang_type):
+                return dd
 
     def validate_coordinate(self):
         if not self.ang_src.strip():

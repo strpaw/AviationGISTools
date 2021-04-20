@@ -120,3 +120,18 @@ class Angle:
                 return -dd
             elif h in ['N', 'E']:
                 return dd
+
+    @staticmethod
+    def dmh_parts_to_dd(dmh_parts):
+        """ Convert coordinates parts into degrees minutes format.
+        Note: If angle is within range, example longitude <-180, 180> will be check in separated method.
+        :param dmh_parts: tuple of degrees (int), minutes (int), seconds (float) and hemisphere character (str)
+        :return: dd: float
+        """
+        d, m, h = dmh_parts
+        if 0 <= m < 60:
+            dd = d + m / 60
+            if h in ['W', 'S']:
+                return -dd
+            elif h in ['N', 'E']:
+                return dd
