@@ -22,6 +22,9 @@ class Bearing(Angle):
         self.err_msg = ""
         self.validate_brng()
 
+    def __str__(self):
+        return self.brng_src
+
     @staticmethod
     def is_within_range(brng_dd):
         """  Check if bearing is within range <0, 360>.

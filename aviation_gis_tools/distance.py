@@ -35,6 +35,9 @@ class Distance:
         self.num_dist = None
         self.check_distance()
 
+    def __str__(self):
+        return "{0.src_dist} {0.src_uom}".format(self)
+
     def check_distance_value(self):
         """ Check if distance is valid: int or float positive number (also with comma as decimal point),
         e. g.:  1455.5; 1455,5

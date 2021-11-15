@@ -56,6 +56,9 @@ class Coordinate(Angle):
         self.err_msg = ""
         self.validate_coordinate()
 
+    def __str__(self):
+        return self.ang_src
+
     @staticmethod
     def is_coordinate_within_range(coord_dd, ang_type):
         """  Check if coordinate is within range for specified angle type.

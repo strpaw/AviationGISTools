@@ -12,7 +12,7 @@ class PointTests(unittest.TestCase):
 
         for ref_id, ref_lon_src, ref_lon_dd, ref_lat_src, ref_lat_dd in ref_point:
             p = PointCalculation(ref_id, ref_lon_src, ref_lat_src)
-            self.assertEqual("", p.err_msg)
+            self.assertEqual("", p.ref_err)
             self.assertAlmostEqual(ref_lon_dd, p.ref_lon.ang_dd)
             self.assertAlmostEqual(ref_lat_dd, p.ref_lat.ang_dd)
 
@@ -28,9 +28,9 @@ class PointTests(unittest.TestCase):
 
             if ref_id.strip() != "":
                 self.assertEqual("{0} longitude error or not supported "
-                                 "format!{0} latitude error or not supported format!".format(p.ref_id), p.err_msg)
+                                 "format!{0} latitude error or not supported format!".format(p.ref_id), p.ref_err)
             else:
                 self.assertEqual("Reference point id required!{0} longitude error or not supported "
-                                 "format!{0} latitude error or not supported format!".format(p.ref_id), p.err_msg)
+                                 "format!{0} latitude error or not supported format!".format(p.ref_id), p.ref_err)
             self.assertIsNone(p.ref_lon.ang_dd)
             self.assertIsNone(p.ref_lat.ang_dd)
