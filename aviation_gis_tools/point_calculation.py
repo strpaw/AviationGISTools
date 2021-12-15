@@ -4,6 +4,45 @@ from aviation_gis_tools.bearing import *
 from aviation_gis_tools.ellipsoid_calc import *
 
 
+class Point:
+
+    def __init__(self, point_id, lon, lat, definition=None):
+        self._point_id = point_id
+        self._lon = lon
+        self._lat = lat
+        self._definition = definition
+
+    # TODO: Add __str__ -> compute to human readable
+
+    @classmethod
+    def from_raw_coordinates(cls, point_id: str, lon_raw: str, lat_raw: str) -> 'Point':
+        """ Create Point from 'raw' coordinates, example: 'E0150000', 'N770000'. """
+        lon = Coordinate(lon_raw, AT_LONGITUDE)
+        lat = Coordinate(lat_raw, AT_LATITUDE)
+        if lon.ang_dd and lat.ang_dd:
+            return cls(point_id, lon.ang_dd, lat.ang_dd, definition=f'{lon_raw} {lat_raw}')
+
+    @classmethod
+    def from_polar_coordinates(cls, ref_point: 'Point', point_id: str, distance: Distance, azimuth: Bearing) -> 'Point':
+        """ Create point based on:
+                reference point longitude, latitude
+                distance from reference point to calculated point
+                azimuth from reference point to calculated point
+        """
+        try:
+            lon_dd, lat_dd = vincenty_direct_solution(lon_initial=ref_point._lon,
+                                                      lat_initial=ref_point._lat,
+                                                      azimuth_initial=azimuth.brng_dd,
+                                                      distance=distance.convert_distance_to_uom(UOM_M))
+        except TypeError:
+            pass  # TODO: add handling error: TypeError: cannot unpack non-iterable NoneType object
+        else:
+            definition = f'Reference point:  ident {ref_point._point_id}; ' \
+                         f'Coordinates {ref_point._definition}; ' \
+                         f'Distance: {distance}; Azimuth: {azimuth}'
+            return cls(point_id, lon_dd, lat_dd, definition)
+
+
 class PointCalculation:
 
     def __init__(self, ref_id, ref_lon, ref_lat):
