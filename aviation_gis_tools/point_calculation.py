@@ -13,6 +13,25 @@ class Point:
         self._definition = definition
 
     # TODO: Add __str__ -> compute to human readable
+    @staticmethod
+    def get_offset_azimuth(azimuth, offset_side):
+        """
+        :param azimuth float
+        :param offset_side: str, "LEFT" or "RIGHT"
+        :return: float
+        """
+
+        if offset_side == 'LEFT':
+            offset_azimuth = azimuth - 90
+        elif offset_side == 'RIGHT':
+            offset_azimuth = azimuth + 90
+        # Normalize azm to [0,360] degrees
+        if offset_azimuth < 0:
+            offset_azimuth += 360
+        elif offset_azimuth > 360:
+            offset_azimuth -= 360
+
+        return offset_azimuth
 
     @classmethod
     def from_raw_coordinates(cls, point_id: str, lon_raw: str, lat_raw: str) -> 'Point':
@@ -40,6 +59,37 @@ class Point:
             definition = f'Reference point:  ident {ref_point._point_id}; ' \
                          f'Coordinates {ref_point._definition}; ' \
                          f'Distance: {distance}; Azimuth: {azimuth}'
+            return cls(point_id, lon_dd, lat_dd, definition)
+
+    @classmethod
+    def from_offset(cls, ref_point: 'Point', point_id: str, distance: Distance, azimuth: Bearing, offset_side: str,
+                    offset_distance: Distance) -> 'Point':
+        """ Create point based on:
+                reference point longitude, latitude
+                'offset' side: LEFT, RIGHT
+                distance from reference point along azimuth
+                distance from azimuth line to calculated point
+        """
+        try:
+            offset_azimuth = Point.get_offset_azimuth(azimuth.brng_dd, offsgiet_side)
+
+            # Calculate 'intermediate' point
+            inter_lon, inter_lat = vincenty_direct_solution(lon_initial=ref_point._lon,
+                                                            lat_initial=ref_point._lat,
+                                                            azimuth_initial=azimuth.brng_dd,
+                                                            distance=distance.convert_distance_to_uom(UOM_M))
+
+            lon_dd, lat_dd = vincenty_direct_solution(lon_initial=inter_lon,
+                                                      lat_initial=inter_lat,
+                                                      azimuth_initial=offset_azimuth,
+                                                      distance=offset_distance.convert_distance_to_uom(UOM_M))
+        except TypeError:
+            pass  # TODO: add handling error: TypeError: cannot unpack non-iterable NoneType object
+        else:
+            definition = f'Reference point:  ident {ref_point._point_id}; ' \
+                         f'Coordinates {ref_point._definition}; ' \
+                         f'Distance: {distance}; Azimuth: {azimuth}; ' \
+                         f'Offset side: {offset_side}; Offset distance: {offset_distance}'
             return cls(point_id, lon_dd, lat_dd, definition)
 
 
