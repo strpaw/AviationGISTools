@@ -56,9 +56,8 @@ class Point:
         except TypeError:
             pass  # TODO: add handling error: TypeError: cannot unpack non-iterable NoneType object
         else:
-            definition = f'Reference point:  ident {ref_point._point_id}; ' \
-                         f'Coordinates {ref_point._definition}; ' \
-                         f'Distance: {distance}; Azimuth: {azimuth}'
+            definition = f'Ref: {ref_point._point_id} {ref_point._definition}; ' \
+                         f'Dist: {distance}; Azm: {azimuth}'
             return cls(point_id, lon_dd, lat_dd, definition)
 
     @classmethod
@@ -71,7 +70,7 @@ class Point:
                 distance from azimuth line to calculated point
         """
         try:
-            offset_azimuth = Point.get_offset_azimuth(azimuth.brng_dd, offsgiet_side)
+            offset_azimuth = Point.get_offset_azimuth(azimuth.brng_dd, offset_side)
 
             # Calculate 'intermediate' point
             inter_lon, inter_lat = vincenty_direct_solution(lon_initial=ref_point._lon,
@@ -86,10 +85,9 @@ class Point:
         except TypeError:
             pass  # TODO: add handling error: TypeError: cannot unpack non-iterable NoneType object
         else:
-            definition = f'Reference point:  ident {ref_point._point_id}; ' \
-                         f'Coordinates {ref_point._definition}; ' \
-                         f'Distance: {distance}; Azimuth: {azimuth}; ' \
-                         f'Offset side: {offset_side}; Offset distance: {offset_distance}'
+            definition = f'Ref: {ref_point._point_id} {ref_point._definition}; ' \
+                         f'Dist: {distance}; Azm: {azimuth}; ' \
+                         f'Offset side: {offset_side}; Offset dist: {offset_distance}'
             return cls(point_id, lon_dd, lat_dd, definition)
 
 
