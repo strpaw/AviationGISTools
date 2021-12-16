@@ -12,7 +12,11 @@ class Point:
         self._lat = lat
         self._definition = definition
 
-    # TODO: Add __str__ -> compute to human readable
+    def __str__(self):
+        lon_dms = Angle.convert_dd_to_dms(self._lon, AT_LONGITUDE)
+        lat_dms = Angle.convert_dd_to_dms(self._lat, AT_LATITUDE)
+        return f'{lon_dms} {lat_dms}'
+
     @staticmethod
     def get_offset_azimuth(azimuth, offset_side):
         """
