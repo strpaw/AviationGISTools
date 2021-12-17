@@ -1,5 +1,4 @@
 import unittest
-from aviation_gis_tools.ellipsoid_calc import *
 
 
 class AngleTests(unittest.TestCase):

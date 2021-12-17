@@ -1,4 +1,4 @@
-from aviation_gis_tools.angle import *
+from aviation_gis_tools._deprecated_version0.angle import *
 
 
 BEARING_COMPACTED = {

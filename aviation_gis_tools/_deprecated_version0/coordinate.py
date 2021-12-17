@@ -1,5 +1,4 @@
-import re
-from aviation_gis_tools.angle import *
+from aviation_gis_tools._deprecated_version0.angle import *
 
 COORDINATE_COMPACTED = {
     AT_LONGITUDE: {

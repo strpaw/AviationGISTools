@@ -1,5 +1,4 @@
 import unittest
-from aviation_gis_tools.point_calculation import *
 
 
 class PointTests(unittest.TestCase):

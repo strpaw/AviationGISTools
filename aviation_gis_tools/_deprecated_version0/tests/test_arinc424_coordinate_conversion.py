@@ -1,5 +1,4 @@
 import unittest
-from aviation_gis_tools.arinc424_coordinate_conversion import *
 
 
 class DistToLonLatTests(unittest.TestCase):

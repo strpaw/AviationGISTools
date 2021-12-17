@@ -1,7 +1,7 @@
-from aviation_gis_tools.coordinate import *
-from aviation_gis_tools.distance import *
-from aviation_gis_tools.bearing import *
-from aviation_gis_tools.ellipsoid_calc import *
+from aviation_gis_tools._deprecated_version0.coordinate import *
+from aviation_gis_tools._deprecated_version0.distance import *
+from aviation_gis_tools._deprecated_version0.bearing import *
+from aviation_gis_tools._deprecated_version0.ellipsoid_calc import *
 
 
 def check_point_definition(func):

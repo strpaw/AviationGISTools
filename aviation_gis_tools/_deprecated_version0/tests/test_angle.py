@@ -1,5 +1,4 @@
 import unittest
-from aviation_gis_tools.angle import *
 
 
 class AngleTests(unittest.TestCase):
