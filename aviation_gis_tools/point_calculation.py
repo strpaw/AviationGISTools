@@ -4,6 +4,29 @@ from aviation_gis_tools.bearing import *
 from aviation_gis_tools.ellipsoid_calc import *
 
 
+def check_point_definition(func):
+    """ Check input data for point calculated from 'raw coordinates', polar coordinates, offset coordinates"""
+    def wrapper(*args, **kwargs):
+        err = ''
+        for argname, argvalue in kwargs.items():
+            if argname == 'point_id':
+                if not argvalue.strip():
+                    err = 'Point ident required. '
+            if argname == 'lon':
+                if argvalue.ang_type != AT_LONGITUDE:
+                    err += f'Arg lon: Coordinate type longitude expected, type {argvalue.ang_type} passed. '
+            if argname == 'lat':
+                if argvalue.ang_type != AT_LATITUDE:
+                    err += f'Arg lat: Coordinate type latitude expected, type {argvalue.ang_type} passed. '
+
+        err += ' '.join([argvalue.err_msg for argname, argvalue in kwargs.items()
+                         if argname in ['distance', 'azimuth', 'offset_distance', 'lon', 'lat'] and argvalue.err_msg])
+        if err:
+            raise ValueError(err)
+        return func(*args, **kwargs)
+    return wrapper
+
+
 class Point:
 
     def __init__(self, point_id, lon, lat, definition=None):
@@ -38,15 +61,14 @@ class Point:
         return offset_azimuth
 
     @classmethod
-    def from_raw_coordinates(cls, point_id: str, lon_raw: str, lat_raw: str) -> 'Point':
+    @check_point_definition
+    def from_raw_coordinates(cls, *, point_id: str, lon: Coordinate, lat: Coordinate) -> 'Point':
         """ Create Point from 'raw' coordinates, example: 'E0150000', 'N770000'. """
-        lon = Coordinate(lon_raw, AT_LONGITUDE)
-        lat = Coordinate(lat_raw, AT_LATITUDE)
-        if lon.ang_dd and lat.ang_dd:
-            return cls(point_id, lon.ang_dd, lat.ang_dd, definition=f'{lon_raw} {lat_raw}')
+        return cls(point_id, lon.ang_dd, lat.ang_dd, definition=f'{lon} {lat}')
 
     @classmethod
-    def from_polar_coordinates(cls, ref_point: 'Point', point_id: str, distance: Distance, azimuth: Bearing) -> 'Point':
+    @check_point_definition
+    def from_polar_coordinates(cls, *, ref_point: 'Point', point_id: str, distance: Distance, azimuth: Bearing) -> 'Point':
         """ Create point based on:
                 reference point longitude, latitude
                 distance from reference point to calculated point
@@ -65,7 +87,8 @@ class Point:
             return cls(point_id, lon_dd, lat_dd, definition)
 
     @classmethod
-    def from_offset(cls, ref_point: 'Point', point_id: str, distance: Distance, azimuth: Bearing, offset_side: str,
+    @check_point_definition
+    def from_offset(cls, *, ref_point: 'Point', point_id: str, distance: Distance, azimuth: Bearing, offset_side: str,
                     offset_distance: Distance) -> 'Point':
         """ Create point based on:
                 reference point longitude, latitude
