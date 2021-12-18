@@ -61,6 +61,13 @@ def vincenty_direct_solution(*,
     ...                          distance_meters=243855.411,
     ...                          ellipsoid_name='WGS84'), tuple)
     True
+    >>> end_coordinates = vincenty_direct_solution(lon_initial=137.5,
+    ...                          lat_initial=-32.5,
+    ...                          azimuth_initial=127.5,
+    ...                          distance_meters=243855.411,
+    ...                          ellipsoid_name='WGS84')  # Tuple elements are float
+    >>> all(map(lambda coordinate: isinstance(coordinate, float), end_coordinates))
+    True
     >>> vincenty_direct_solution(lon_initial=137.5,
     ...                          lat_initial=-32.5,
     ...                          azimuth_initial=127.5,
@@ -69,6 +76,13 @@ def vincenty_direct_solution(*,
     Traceback (most recent call last):
     ...
     KeyError: Ellipsoid not defined ellipsoid not found!
+    >>> vincenty_direct_solution(137.5,
+    ...                          -32.5,
+    ...                          127.5,
+    ...                          243855.411)
+    Traceback (most recent call last):
+    ...
+    TypeError: vincenty_direct_solution() takes 0 positional arguments but 4 were given
     """
     try:
         a, b, f = ellipsoids[ellipsoid_name]
