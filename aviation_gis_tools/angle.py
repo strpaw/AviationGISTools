@@ -1,5 +1,6 @@
 from math import fabs
-from typing import Tuple
+from typing import Tuple, Union
+import re
 
 # Angle types
 AT_LONGITUDE = 'AT_LONGITUDE'
@@ -33,6 +34,16 @@ class Angle:
 
     def __init__(self):
         pass
+
+    @staticmethod
+    def normalize_angle(ang_src: str) -> str:
+        """ Normalize angle, e. g. replace ',' with '.', ensure cardinal directions (N, S etc.) are capital etc.
+        :param ang_src: str, angle source valueb
+        >>> assert Angle.normalize_angle(' 32   44 56,77n') == '32 44 56.77N'
+        """
+        norm_ang = ang_src.strip().upper().replace(',', '.')
+        norm_ang = re.sub(r'\s+', ' ', norm_ang)
+        return norm_ang
 
     @staticmethod
     def dd_to_dms_parts(ang_dd: float, prec: int = 3) -> Tuple[int, int, float]:
@@ -115,3 +126,71 @@ class Angle:
 
         dms_format_pattern = ANGLE_FORMAT_PATTERNS[ang_type][dms_format]
         return dms_format_pattern.format(d=int(fabs(d)), m=m, s=s, sec_length=sec_length, sec_prec=prec, h=h)
+
+    @staticmethod
+    def dmsh_parts_to_dd(dmsh_parts: Tuple[int, int, float, str]) -> Union[float, None]:
+        """ Convert coordinates parts into degrees minutes format.
+        Note: If angle is within range, example longitude <-180, 180> will be check in separated method
+        :param dmsh_parts: tuple of degrees (int), minutes (int), seconds (float) and hemisphere character (str)
+        :return: dd: float
+        >>> assert Angle.dmsh_parts_to_dd((100, 35, 44, 'N')) == 100.59555555555555
+        >>> assert Angle.dmsh_parts_to_dd((100, 35, 44, 'W')) == -100.59555555555555
+        >>> Angle.dmsh_parts_to_dd((100, 61, 59, 'W'))
+        Traceback (most recent call last):
+        ValueError: Minutes 61 or/and seconds 59 outside range <0, 60)
+        >>> Angle.dmsh_parts_to_dd((100, 0, 60, 'E'))
+        Traceback (most recent call last):
+        ValueError: Minutes 0 or/and seconds 60 outside range <0, 60)
+        >>> Angle.dmsh_parts_to_dd((100, -1, 0, 'S'))
+        Traceback (most recent call last):
+        ValueError: Minutes -1 or/and seconds 0 outside range <0, 60)
+        >>> Angle.dmsh_parts_to_dd((100, 5, 10, 'A'))
+        Traceback (most recent call last):
+        ValueError: Hemisphere designator A not allowed
+        """
+        d, m, s, h = dmsh_parts
+
+        if (0 <= m < 60) and (0 <= s < 60):
+            dd = d + m / 60 + s / 3600
+            if h in ['W', 'S']:
+                return -dd
+            elif h in ['N', 'E']:
+                return dd
+            else:
+                raise ValueError(f'Hemisphere designator {h} not allowed')
+        else:
+            raise ValueError(f'Minutes {m} or/and seconds {s} outside range <0, 60)')
+
+    @staticmethod
+    def dmh_parts_to_dd(dmh_parts: Tuple[int, float, str]) -> Union[float, None]:
+        """ Convert coordinates parts into degrees minutes format.
+        Note: If angle is within range, example longitude <-180, 180> will be check in separated method
+        :param dmh_parts: tuple of degrees (int), minutes (int), seconds (float) and hemisphere character (str)
+        :return: dd: float
+        >>> assert Angle.dmh_parts_to_dd((10, 35.123, 'N')) == 10.5853833333333333
+        >>> assert Angle.dmh_parts_to_dd((100, 35.123, 'W')) == -100.5853833333333333
+        >>> Angle.dmh_parts_to_dd((100, 61, 'W'))
+        Traceback (most recent call last):
+        ValueError: Minutes: 61 outside range <0, 60)
+        >>> Angle.dmh_parts_to_dd((100, 60, 'E'))
+        Traceback (most recent call last):
+        ValueError: Minutes: 60 outside range <0, 60)
+        >>> Angle.dmh_parts_to_dd((100, -1, 'S'))
+        Traceback (most recent call last):
+        ValueError: Minutes: -1 outside range <0, 60)
+        >>> Angle.dmh_parts_to_dd((100, 5, 'A'))
+        Traceback (most recent call last):
+        ValueError: Hemisphere designator A not allowed
+        """
+        d, m, h = dmh_parts
+
+        if 0 <= m < 60:
+            dd = d + m / 60
+            if h in ['W', 'S']:
+                return -dd
+            elif h in ['N', 'E']:
+                return dd
+            else:
+                raise ValueError(f'Hemisphere designator {h} not allowed')
+        else:
+            raise ValueError(f'Minutes: {m} outside range <0, 60)')
