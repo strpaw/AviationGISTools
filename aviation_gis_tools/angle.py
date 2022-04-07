@@ -46,6 +46,22 @@ class Angle:
         return norm_ang
 
     @staticmethod
+    def is_angle_within_range(ang_dd: float, ang_type: str) -> Union[float, None]:
+        """  Check if coordinate is within range for specified angle type
+        :param ang_dd: float, coordinate to check
+        :param ang_type: const(str): type of angle
+        :return:
+        """
+        if ang_type == AT_LONGITUDE:
+            return -180 <= ang_dd <= 180
+        elif ang_type == AT_LATITUDE:
+            return -90 <= ang_dd <= 90
+        elif ang_type == AT_BEARING:
+            return 0 <= ang_dd <= 360
+        else:
+            raise ValueError(f'Angle type {ang_type} not supported.')
+
+    @staticmethod
     def dd_to_dms_parts(ang_dd: float, prec: int = 3) -> Tuple[int, int, float]:
         """ Extract degrees, minutes, seconds from angle in DD (decimal degrees) format.
         >>> assert Angle.dd_to_dms_parts(0) == (0, 0, 0.000)
