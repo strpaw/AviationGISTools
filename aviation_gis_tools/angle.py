@@ -46,11 +46,32 @@ class Angle:
         return norm_ang
 
     @staticmethod
-    def is_angle_within_range(ang_dd: float, ang_type: str) -> Union[float, None]:
+    def is_angle_within_range(ang_dd: float, ang_type: str) -> Union[bool, None]:
         """  Check if coordinate is within range for specified angle type
         :param ang_dd: float, coordinate to check
         :param ang_type: const(str): type of angle
-        :return:
+        >>> assert  Angle.is_angle_within_range(-180.001, AT_LONGITUDE) is False
+        >>> assert  Angle.is_angle_within_range(-180.00, AT_LONGITUDE) is True
+        >>> assert  Angle.is_angle_within_range(-179.999, AT_LONGITUDE) is True
+        >>> assert  Angle.is_angle_within_range(179.999, AT_LONGITUDE) is True
+        >>> assert  Angle.is_angle_within_range(180.00, AT_LONGITUDE) is True
+        >>> assert  Angle.is_angle_within_range(180.001, AT_LONGITUDE) is False
+        >>> assert  Angle.is_angle_within_range(-90.001, AT_LATITUDE) is False
+        >>> assert  Angle.is_angle_within_range(-90.00, AT_LATITUDE) is True
+        >>> assert  Angle.is_angle_within_range(-89.999, AT_LATITUDE) is True
+        >>> assert  Angle.is_angle_within_range(89.999, AT_LATITUDE) is True
+        >>> assert  Angle.is_angle_within_range(90.00, AT_LATITUDE) is True
+        >>> assert  Angle.is_angle_within_range(90.001, AT_LATITUDE) is False
+        >>> assert  Angle.is_angle_within_range(-0.001, AT_BEARING) is False
+        >>> assert  Angle.is_angle_within_range(0.000, AT_BEARING) is True
+        >>> assert  Angle.is_angle_within_range(0.001, AT_BEARING) is True
+        >>> assert  Angle.is_angle_within_range(359.999, AT_BEARING) is True
+        >>> assert  Angle.is_angle_within_range(360.000, AT_BEARING) is True
+        >>> assert  Angle.is_angle_within_range(360.001, AT_BEARING) is False
+        >>> Angle.is_angle_within_range(123, 'AT_NONE')
+        Traceback (most recent call last):
+        ...
+        ValueError: Angle type AT_NONE is not supported.
         """
         if ang_type == AT_LONGITUDE:
             return -180 <= ang_dd <= 180
@@ -59,7 +80,8 @@ class Angle:
         elif ang_type == AT_BEARING:
             return 0 <= ang_dd <= 360
         else:
-            raise ValueError(f'Angle type {ang_type} not supported.')
+            raise ValueError(f'Angle type {ang_type} is not supported.')
+
 
     @staticmethod
     def dd_to_dms_parts(ang_dd: float, prec: int = 3) -> Tuple[int, int, float]:

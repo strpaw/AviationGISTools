@@ -80,6 +80,32 @@ class Coordinate(Angle):
         :param ang_type: str
         :return: float: angle in decimal degrees format, if conversion failed (not supported format,
                  error in angle example minutes >= 60, incorrect type - returns None)
+        >>> assert Coordinate.convert_compacted_to_dd('1800000E', AT_LONGITUDE) == 180.0
+        >>> assert Coordinate.convert_compacted_to_dd('1800000.0W', AT_LONGITUDE) == -180.0
+        >>> assert Coordinate.convert_compacted_to_dd('E1800000', AT_LONGITUDE) == 180.0
+        >>> assert Coordinate.convert_compacted_to_dd('W1800000.0', AT_LONGITUDE) == -180.0
+        >>> assert Coordinate.convert_compacted_to_dd('W0003000.000', AT_LONGITUDE) == -0.5
+        >>> assert Coordinate.convert_compacted_to_dd('E1234601.445', AT_LONGITUDE) == 123.76706805555555
+        >>> assert Coordinate.convert_compacted_to_dd('E1810000', AT_LONGITUDE) is None
+        >>> assert Coordinate.convert_compacted_to_dd('S200000.00', AT_LONGITUDE) is None
+        >>> assert Coordinate.convert_compacted_to_dd('900000N', AT_LATITUDE) == 90.0
+        >>> assert Coordinate.convert_compacted_to_dd('900000.0S', AT_LATITUDE) == -90.0
+        >>> assert Coordinate.convert_compacted_to_dd('234601.445N', AT_LATITUDE) == 23.767068055555555
+        >>> assert Coordinate.convert_compacted_to_dd('N900000', AT_LATITUDE) == 90.0
+        >>> assert Coordinate.convert_compacted_to_dd('S900000.0', AT_LATITUDE) == -90.0
+        >>> assert Coordinate.convert_compacted_to_dd('N003000.000', AT_LATITUDE) == 0.5
+        >>> assert Coordinate.convert_compacted_to_dd('S900000.001', AT_LATITUDE) is None
+        >>> assert Coordinate.convert_compacted_to_dd('E0900000.0', AT_LATITUDE) is None
+        >>> assert Coordinate.convert_compacted_to_dd('18000.00E', AT_LONGITUDE) == 180.0
+        >>> assert Coordinate.convert_compacted_to_dd('18000.0000W', AT_LONGITUDE) == -180.0
+        >>> assert Coordinate.convert_compacted_to_dd('E04750.222', AT_LONGITUDE) == 47.83703333333333
+        >>> assert Coordinate.convert_compacted_to_dd('W18010.000', AT_LONGITUDE) is None
+        >>> assert Coordinate.convert_compacted_to_dd('S9010.000', AT_LONGITUDE) is None
+        >>> assert Coordinate.convert_compacted_to_dd('9000.00S', AT_LATITUDE) == -90.0
+        >>> assert Coordinate.convert_compacted_to_dd('9000.0000N', AT_LATITUDE) == 90.0
+        >>> assert Coordinate.convert_compacted_to_dd('S4750.222', AT_LATITUDE) == -47.83703333333333
+        >>> assert Coordinate.convert_compacted_to_dd('N9010.000', AT_LATITUDE) is None
+        >>> assert Coordinate.convert_compacted_to_dd('E09010.000', AT_LATITUDE) is None
         """
         dd = None
 
@@ -100,10 +126,8 @@ class Coordinate(Angle):
                     dd = Coordinate.dmh_parts_to_dd((d, m, h))
 
         if dd:
-            if Coordinate.is_angle_within_range(dd, ang_type):  # TODO: as decorator
+            if Coordinate.is_angle_within_range(dd, ang_type):
                 return dd
-            else:
-                raise ValueError(f'Coordinate {coord_src} is outside range for angle type {ang_type}')
 
     @staticmethod
     def convert_to_dd(coord_src: Union[str, float, int],
