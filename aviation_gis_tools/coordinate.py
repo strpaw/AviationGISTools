@@ -60,7 +60,7 @@ class Coordinate(Angle):
         self._coord_src = coord_src
         self._coord_type = coord_type
         self._coord_label = coord_label
-        self._coord_dd = Coordinate.convert_compacted_to_dd(self._coord_src, self._coord_type)
+        self._coord_dd = Coordinate.convert_to_dd(self._coord_src, self._coord_type, self._coord_label)
 
     def __str__(self):
         return self._coord_src

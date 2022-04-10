@@ -65,6 +65,14 @@ class Distance(AviationBase):
         self._num_value: Union[float, None] = Distance.convert_to_number(self._value)
         self.check_source_values()
 
+    @property
+    def err(self):
+        return self._err
+
+    @property
+    def num_value(self):
+        return self._num_value
+
     def check_source_values(self) -> None:
         """
         >>> d = Distance(100)
