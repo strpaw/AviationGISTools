@@ -61,6 +61,11 @@ class Coordinate(Angle):
         self._coord_type = coord_type
         self._coord_label = coord_label
         self._coord_dd = Coordinate.convert_to_dd(self._coord_src, self._coord_type, self._coord_label)
+        if self._coord_dd is None:
+            if coord_label:
+                raise ValueError(f'{coord_label} incorrect or unsupported format')
+            else:
+                raise ValueError(f'{coord_type} incorrect or unsupported format')
 
     def __str__(self):
         return self._coord_src
