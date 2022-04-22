@@ -63,9 +63,9 @@ class Coordinate(Angle):
         self._coord_dd = Coordinate.convert_to_dd(self._coord_src, self._coord_type, self._coord_label)
         if self._coord_dd is None:
             if coord_label:
-                raise ValueError(f'{coord_label} incorrect or unsupported format')
+                raise ValueError(f'{coord_label} incorrect or unsupported format.\n')
             else:
-                raise ValueError(f'{coord_type} incorrect or unsupported format')
+                raise ValueError(f'{coord_type} incorrect or unsupported format.\n')
 
     def __str__(self):
         return self._coord_src
@@ -150,8 +150,8 @@ class Coordinate(Angle):
 
         if not Coordinate.normalize_angle(coord_src):
             if coord_label:
-                raise ValueError(f'{coord_label} is empty')
+                raise ValueError(f'{coord_label} is empty.\n')
             else:
-                raise ValueError(f'{coord_type} is empty')
+                raise ValueError(f'{coord_type} is empty.\n')
 
         return Coordinate.convert_compacted_to_dd(coord_src, coord_type)

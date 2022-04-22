@@ -24,17 +24,17 @@ def check_point_definition(func):
 
             if aname in ['dist', 'offset_dist', 'x', 'y']:
                 if avalue.err:
-                    err += f'{aname}: {avalue.err}'
+                    err += f'{aname}: {avalue.err}\n'
 
             if aname in ['azimuth', 'x_azm', 'y_azm']:
                 try:
                     float(avalue)
                 except ValueError:
-                    err += f'{aname} value error: {avalue}.'
+                    err += f'{aname} value error: {avalue}.\n'
 
             if aname == 'offset_side':
                 if avalue not in ['LEFT', 'RIGHT']:
-                    err += f'Offset side error: {avalue}.'
+                    err += f'Offset side error: {avalue}.\n'
 
         if err:
             raise ValueError(err)
@@ -128,14 +128,18 @@ class Point:
         Traceback (most recent call last):
         ...
         ValueError: dist: Source value error: 100A.
+        <BLANKLINE>
         >>> ref_p.distance_azimuth_to_coordinates(dist=Distance('100'), azimuth='123A')
         Traceback (most recent call last):
         ...
         ValueError: azimuth value error: 123A.
+        <BLANKLINE>
         >>> ref_p.distance_azimuth_to_coordinates(dist=Distance('100A'), azimuth='123A')
         Traceback (most recent call last):
         ...
-        ValueError: dist: Source value error: 100A.azimuth value error: 123A.
+        ValueError: dist: Source value error: 100A.
+        azimuth value error: 123A.
+        <BLANKLINE>
         """
         lon_dd, lat_dd = vincenty_direct_solution(lon_initial=self._lon.coord_dd,
                                                   lat_initial=self._lat.coord_dd,
@@ -167,6 +171,7 @@ class Point:
         Traceback (most recent call last):
         ...
         ValueError: dist: Source value error: 1800A.
+        <BLANKLINE>
         >>> calc_p = ref_p.distance_azimuth_offset_to_coordinates(dist=Distance('1800'),
         ...                                                       azimuth='123A',
         ...                                                       offset_side='LEFT',
@@ -174,6 +179,7 @@ class Point:
         Traceback (most recent call last):
         ...
         ValueError: azimuth value error: 123A.
+        <BLANKLINE>
         >>> calc_p = ref_p.distance_azimuth_offset_to_coordinates(dist=Distance('1800'),
         ...                                                       azimuth=123,
         ...                                                       offset_side='TEST',
@@ -181,6 +187,7 @@ class Point:
         Traceback (most recent call last):
         ...
         ValueError: Offset side error: TEST.
+        <BLANKLINE>
         >>> calc_p = ref_p.distance_azimuth_offset_to_coordinates(dist=Distance('1800'),
         ...                                                       azimuth=123,
         ...                                                       offset_side='LEFT',
@@ -188,13 +195,17 @@ class Point:
         Traceback (most recent call last):
         ...
         ValueError: offset_dist: Source value error: 120A.
+        <BLANKLINE>
         >>> calc_p = ref_p.distance_azimuth_offset_to_coordinates(dist=Distance('1800'),
         ...                                                       azimuth='123A',
         ...                                                       offset_side='TEST',
         ...                                                       offset_dist=Distance('120A'))
         Traceback (most recent call last):
         ...
-        ValueError: azimuth value error: 123A.Offset side error: TEST.offset_dist: Source value error: 120A.
+        ValueError: azimuth value error: 123A.
+        Offset side error: TEST.
+        offset_dist: Source value error: 120A.
+        <BLANKLINE>
         """
         offset_azimuth = Point.get_offset_azimuth(azimuth, offset_side)
 
@@ -237,13 +248,16 @@ class Point:
         Traceback (most recent call last):
         ...
         ValueError: x_azm value error: 100A.
+        <BLANKLINE>
         >>> calc_p = ref_p.cartesian_to_coordinates(x_azm=100,
         ...                                         y_azm='190A',
         ...                                         x=Distance(1200),
         ...                                         y=Distance('230A'))
         Traceback (most recent call last):
         ...
-        ValueError: y_azm value error: 190A.y: Source value error: 230A.
+        ValueError: y_azm value error: 190A.
+        y: Source value error: 230A.
+        <BLANKLINE>
         """
         # Calculate 'intermediate' point
         inter_lon, inter_lat = vincenty_direct_solution(lon_initial=self._lon.coord_dd,
